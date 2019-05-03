@@ -15,8 +15,9 @@ class Material(metaclass=MetaLinked):
             if not hasattr(self, '_Subject__{}'.format(key)):
                 setattr(self, '_Subject__{}'.format(key), Subject(key))
         for key in self._state:
-            for dep in self._linked[key].depended_on:
-                getattr(self, '_Subject__{}'.format(key)).register(getattr(self, '_Subject__{}'.format(dep)))
+            if hasattr(self._linked[key], '_depended_on'):
+                for dep in self._linked[key]._depended_on:
+                    getattr(self, '_Subject__{}'.format(dep)).register(getattr(self, '_Subject__{}'.format(key)))
 
     _state = list()
     _linked = dict()

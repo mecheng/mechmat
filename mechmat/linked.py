@@ -8,7 +8,7 @@ from . import ureg
 
 
 class Linked:
-    def __init__(self, unit='dimesnionless', rng=[-inf, inf], linked_properties={}):
+    def __init__(self, unit='dimensionless', rng=[-inf, inf], linked_properties={}):
         self.key = ''
         self.subject_key = ''
         self.property = ''
@@ -17,7 +17,7 @@ class Linked:
         self._linked_properties = linked_properties
         self._args = dict(
             zip(list(linked_properties.keys()), [set(args.values()) for args in linked_properties.values()]))
-        self._depend_on = list(set([y for x in self._args.values() for y in x]))
+        self._depended_on = list(set([y for x in self._args.values() for y in x]))
 
     def __get__(self, instance, owner):
         if hasattr(instance, self.key):
@@ -28,7 +28,7 @@ class Linked:
 
     def __set__(self, instance, value):
         upd = set()
-        if instance(value, set):
+        if isinstance(value, set):
             upd = value
             value = getattr(instance, self.property)
             sorted_fun = Linked.get_sorted_functions(upd, self._args)
@@ -85,6 +85,6 @@ class MetaLinked(type):
                 attr.property = key
                 type_name = type(attr).__name__
                 attr.key = '_{}__{}'.format(type_name, key)
-                attr.subj = '_Subject__{}'.format(key)
+                attr.subject_key = '_Subject__{}'.format(key)
                 getattr(cls, '_state').append(key)
                 getattr(cls, '_linked')[key] = attr
