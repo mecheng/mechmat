@@ -2,6 +2,8 @@ from math import inf, isnan
 from copy import copy
 import logging
 
+from numpy import any
+
 from pint import DimensionalityError
 
 from . import ureg
@@ -36,15 +38,17 @@ class Linked:
                 kwargs = copy(self._linked_properties[func])
                 for arg in kwargs.keys():
                     kwargs[arg] = getattr(instance, kwargs[arg])
-                if None in kwargs.values():
+                if any([x is None for x in kwargs.values()]):
                     continue
                 value = func(**kwargs)
                 logging.debug('Property {} calculated'.format(self.property))
                 break
 
-        if getattr(instance, self.property) != value and value is not None:
+        if type(getattr(instance, self.property)) != type(value) or (
+                getattr(instance, self.property) != value and value is not None):
             try:
-                value = value.to(self.unit)
+                if isinstance(value, ureg.Quantity):
+                    value = value.to(self.unit)
             except DimensionalityError as e:
                 raise DimensionalityError(e.units1, e.units2, e.dim1, e.dim2,
                                           'Wrong dimensions when setting {} with value {} in material {} with id {}'.format(
@@ -62,7 +66,10 @@ class Linked:
 
     @staticmethod
     def in_range(value, rng):
-        return ((rng[0].m <= value.m) & (rng[1].m >= value.m)) or isnan(value.m)
+        if isinstance(value, ureg.Quantity):
+            return any(((rng[0].m <= value.m) & (rng[1].m >= value.m))) or any(isnan(value.m))
+        else:
+            return any(((rng[0].m <= value) & (rng[1].m >= value))) or any(isnan(value))
 
     @staticmethod
     def argument_weight(visited, arg):
@@ -86,5 +93,6 @@ class MetaLinked(type):
                 type_name = type(attr).__name__
                 attr.key = '_{}__{}'.format(type_name, key)
                 attr.subject_key = '_Subject__{}'.format(key)
-                getattr(cls, '_state').append(key)
+                if key[0] != '_':
+                    getattr(cls, '_state').append(key)
                 getattr(cls, '_linked')[key] = attr
