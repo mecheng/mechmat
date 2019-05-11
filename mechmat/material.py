@@ -2,7 +2,7 @@
 from copy import deepcopy
 from enum import Enum
 from yaml import dump, load
-from pytablewriter import MarkdownTableWriter
+from pytablewriter import MarkdownTableWriter, HtmlTableWriter, LatexTableWriter
 
 from .linked import MetaLinked, Linked
 from .subject import Subject
@@ -95,18 +95,30 @@ class Material(metaclass=MetaLinked):
     def _tbl_writer(self, writer):
         writer.headers = ['Material Attribute', 'Value']
         tbl = []
+        if isinstance(writer, MarkdownTableWriter) or isinstance(writer, LatexTableWriter):
+            value_str = '$ {:L} $'
+        else:
+            value_str = '{}'
         for prop in self._logistic_properties:
             if getattr(self, prop) is not None:
                 tbl.append([prop.replace('_', ' '), str(getattr(self, prop))])
         for prop in self._state:
             if getattr(self, prop) is not None:
-                tbl.append([prop.replace('_', ' '), str(getattr(self, prop))])
+                tbl.append([prop.replace('_', ' '), value_str.format(getattr(self, prop))])
         writer.value_matrix = tbl
         writer.margin = 1
         return writer
 
     def _repr_markdown_(self):
         writer = self._tbl_writer(MarkdownTableWriter())
+        return writer.write_table()
+
+    def _repr_html_(self):
+        writer = self._tbl_writer(HtmlTableWriter())
+        return writer.write_table()
+
+    def _repr_latex_(self):
+        writer = self._tbl_writer(LatexTableWriter())
         return writer.write_table()
 
     def __call__(self, **kwargs):
