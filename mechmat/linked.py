@@ -7,6 +7,7 @@ from numpy import any
 from pint import DimensionalityError
 
 from . import ureg
+from .errors import OutOfRangeError
 
 
 class Linked:
@@ -45,20 +46,16 @@ class Linked:
                 break
 
         if type(getattr(instance, self.property)) != type(value) or (
-                getattr(instance, self.property) != value and value is not None):
+            getattr(instance, self.property) != value and value is not None):
             try:
                 if isinstance(value, ureg.Quantity):
                     value = value.to(self.unit)
             except DimensionalityError as e:
                 raise DimensionalityError(e.units1, e.units2, e.dim1, e.dim2,
-                                          'Wrong dimensions when setting {} with value {} in material {} with id {}'.format(
-                                              self.property, value, type(instance), id(instance)))
+                                          'Wrong dimensions when setting {} with value {}'.format(
+                                              self.property, value))
             if not Linked.in_range(value, self.rng):
-                raise ValueError(
-                    'Value {} out of range {} for property {} of material {} with id {}'.format(value, self.rng,
-                                                                                                self.property,
-                                                                                                type(instance),
-                                                                                                id(instance)))
+                raise OutOfRangeError(value, self.rng, self.property)
             setattr(instance, self.key, value)
             if self.property not in upd:
                 upd.add(self.property)

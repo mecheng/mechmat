@@ -8,6 +8,6 @@ __version__ = '0.1.0'
 
 from pint import UnitRegistry, set_application_registry
 
-ureg = UnitRegistry()
+ureg = UnitRegistry(autoconvert_offset_to_baseunit=True)
 Q_ = ureg.Quantity
 set_application_registry(ureg)
