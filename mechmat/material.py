@@ -2,6 +2,7 @@
 from copy import deepcopy
 from enum import Enum
 from yaml import dump, load
+from pytablewriter import MarkdownTableWriter
 
 from .linked import MetaLinked, Linked
 from .subject import Subject
@@ -52,13 +53,13 @@ class Material(metaclass=MetaLinked):
     """int: version of the material class. Bump this value up for big changes in the class which aren't compatible with 
         earlier release. """
 
-    category = Category.UNDEFINED
+    category = None
     r""":class:`~Category` The Material category"""
 
-    name = ''
+    name = None
     r"""str: The common name of the material"""
 
-    CAS = ''
+    CAS = None
     r"""str: Chemical Abstracts Service number"""
 
     @property
@@ -70,6 +71,8 @@ class Material(metaclass=MetaLinked):
         if hasattr(self, '_short_name'):
             return self._short_name
         else:
+            if self.name is None:
+                return None
             words = self.name.split(' ')
             if len(words) > 1:
                 return ''.join([w[0] for w in words])
@@ -82,10 +85,29 @@ class Material(metaclass=MetaLinked):
     def __repr__(self):
         state = {}
         for prop in self._logistic_properties:
-            state[prop] = getattr(self, prop)
+            if getattr(self, prop) is not None:
+                state[prop] = getattr(self, prop)
         for prop in self._state:
-            state[prop] = getattr(self, prop)
+            if getattr(self, prop) is not None:
+                state[prop] = getattr(self, prop)
         return '{} with state {}>'.format(str(type(self))[:-2], state)
+
+    def _tbl_writer(self, writer):
+        writer.headers = ['Material Attribute', 'Value']
+        tbl = []
+        for prop in self._logistic_properties:
+            if getattr(self, prop) is not None:
+                tbl.append([prop.replace('_', ' '), str(getattr(self, prop))])
+        for prop in self._state:
+            if getattr(self, prop) is not None:
+                tbl.append([prop.replace('_', ' '), str(getattr(self, prop))])
+        writer.value_matrix = tbl
+        writer.margin = 1
+        return writer
+
+    def _repr_markdown_(self):
+        writer = self._tbl_writer(MarkdownTableWriter())
+        return writer.write_table()
 
     def __call__(self, **kwargs):
         state = deepcopy(self)
