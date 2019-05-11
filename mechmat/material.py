@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
+from enum import Enum
 from yaml import dump, load
 
 from .linked import MetaLinked
@@ -8,6 +9,20 @@ from .subject import Subject
 """Main module."""
 
 __all__ = ['Material']
+
+
+class Category(Enum):
+    """ Categories of different materials """
+
+    UNDEFINED = 0
+    METAL = 1
+    PLASTIC = 2
+    FLUID = 3
+    GAS = 4
+    BINGHAM = 5
+    PSEUDOPLASTIC = 6
+    GRANULAR = 7
+    POWDER = 8
 
 
 class Material(metaclass=MetaLinked):
@@ -22,6 +37,8 @@ class Material(metaclass=MetaLinked):
 
     _state = list()
     _linked = dict()
+
+    category = Category.UNDEFINED
 
     def __repr__(self):
         state = {}
