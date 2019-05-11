@@ -50,3 +50,10 @@ def test_mod_state(simple_material):
     assert simple_material.y == 9. * u.m ** 2
     assert simple_material.x == 3. * u.m
     assert simple_material.z == 1 / 3. * u.m ** -1
+
+
+def test_state_factory(simple_material):
+    mat_A = simple_material(x=3. * u.m)
+    assert mat_A.x == 3. * u.m
+    assert mat_A.y == 9. * u.m ** 2
+    assert mat_A.z == 1 / 3. * u.m ** -1
