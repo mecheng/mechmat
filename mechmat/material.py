@@ -3,7 +3,7 @@ from copy import deepcopy
 from enum import Enum
 from yaml import dump, load
 
-from .linked import MetaLinked
+from .linked import MetaLinked, Linked
 from .subject import Subject
 
 """Main module."""
@@ -98,3 +98,24 @@ class Material(metaclass=MetaLinked):
         """
         # Todo: use _version
         self = load(data)
+
+    density = Linked('kg/m**3')
+    r""":class:`.Linked` Density :math:`\rho` in :math:`[M^{1} L^{-3}]`"""
+
+    specific_weight = Linked('N/m**3')
+    r""":class:`.Linked` Specific weight :math:`\gamma` in :math:`[M^{1} L^{-2} t^{-2}]`"""
+
+    specific_volume = Linked('m**3/kg')
+    r""":class:`.Linked` Specific volume :math:`v` in :math:`[L^{3} M^{-1}]`"""
+
+    temperature = Linked('degC')
+    r""":class:`.Linked` Temperature :math:`T` in :math:`[T]`"""
+
+    specific_heat_at_const_pressure = Linked('J/(kg*K)')
+    r""":class:`.Linked` Specific heat at constant pressure :math:`c_p` in :math:`[L^{2} T^{-1} t^{-2}]`"""
+
+    thermal_conductivity = Linked('W/(m*K)')
+    r""":class:`.Linked` Thermal conductivity :math:`k` in :math:`[L^{1} M^{1} T^{-1} t^{-3}]`"""
+
+    thermal_diffusivity = Linked('m**2/s')
+    r"""":class:`.Linked` Thermal diffusivity :math:`\alpha` in :math:`[L^{2} t^{-1}]`"""
