@@ -90,6 +90,6 @@ class MetaLinked(type):
                 type_name = type(attr).__name__
                 attr.key = '_{}__{}'.format(type_name, key)
                 attr.subject_key = '_Subject__{}'.format(key)
-                if key[0] != '_':
+                if key[0] != '_' and key not in getattr(cls, '_state'):
                     getattr(cls, '_state').append(key)
                 getattr(cls, '_linked')[key] = attr
