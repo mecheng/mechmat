@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from copy import deepcopy
 from yaml import dump, load
 
 from .linked import MetaLinked
@@ -27,6 +28,13 @@ class Material(metaclass=MetaLinked):
         for prop in self._state:
             state[prop] = getattr(self, prop)
         return '{} with state {}>'.format(str(type(self))[:-2], state)
+
+    def __call__(self, **kwargs):
+        state = deepcopy(self)
+        for key, value in kwargs.items():
+            if key in state._state:
+                setattr(state, key, value)
+        return state
 
     def dump(self):
         return dump(self)
