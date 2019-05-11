@@ -26,7 +26,7 @@ class Category(Enum):
 
 
 class Material(metaclass=MetaLinked):
-    def __init__(self):
+    def __init__(self, **kwargs):
         for key in self._linked.keys():
             if not hasattr(self, '_Subject__{}'.format(key)):
                 setattr(self, '_Subject__{}'.format(key), Subject(key))
@@ -34,6 +34,9 @@ class Material(metaclass=MetaLinked):
             if hasattr(self._linked[key], '_depended_on'):
                 for dep in self._linked[key]._depended_on:
                     getattr(self, '_Subject__{}'.format(dep)).register(getattr(self, '_Subject__{}'.format(key)))
+        for key, value in kwargs.items():
+            if key in self._state:
+                setattr(self, key, value)
 
     _state = list()
     _linked = dict()
