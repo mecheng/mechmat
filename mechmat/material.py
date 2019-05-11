@@ -26,6 +26,12 @@ class Category(Enum):
 
 
 class Material(metaclass=MetaLinked):
+    r""""
+    All materials inherit from this class. This class describes the basic properties, which all mater have, such as a
+    *density*, *specific weight*, and *temperature*.
+
+    """
+
     def __init__(self, **kwargs):
         for key in self._linked.keys():
             if not hasattr(self, '_Subject__{}'.format(key)):
@@ -82,7 +88,7 @@ class Material(metaclass=MetaLinked):
     def __call__(self, **kwargs):
         state = deepcopy(self)
         for key, value in kwargs.items():
-            if key in state._state:
+            if key in state._state or key in state._logistic_properties:
                 setattr(state, key, value)
         return state
 
