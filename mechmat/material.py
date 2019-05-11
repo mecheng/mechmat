@@ -81,6 +81,8 @@ class Material(metaclass=MetaLinked):
 
     def __repr__(self):
         state = {}
+        for prop in self._logistic_properties:
+            state[prop] = getattr(self, prop)
         for prop in self._state:
             state[prop] = getattr(self, prop)
         return '{} with state {}>'.format(str(type(self))[:-2], state)
