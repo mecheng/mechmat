@@ -34,8 +34,10 @@ Features
 
 Credits
 -------
+This package makes use of `pint`_ for unit safe calculations.
 
 This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+.. _pint: https://github.com/hgrecco/pint
