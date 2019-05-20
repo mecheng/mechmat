@@ -1,95 +1,234 @@
-from math import inf, isnan
-from copy import copy
 import logging
+from copy import deepcopy
 
-from numpy import any
-
+from numpy import isnan, any
 from pint import DimensionalityError
+from pytablewriter import MarkdownTableWriter, HtmlTableWriter, LatexTableWriter
 
 from . import ureg
 from .errors import OutOfRangeError
 
 
-class Linked:
-    def __init__(self, unit='dimensionless', rng=[-inf, inf], linked_properties={}):
-        self.key = ''
-        self.subject_key = ''
-        self.property = ''
-        self.unit = ureg.parse_units(unit)
-        self.rng = rng * self.unit
-        self._linked_properties = linked_properties
-        self._args = dict(
-            zip(list(linked_properties.keys()), [set(args.values()) for args in linked_properties.values()]))
-        self._depended_on = list(set([y for x in self._args.values() for y in x]))
+class Message(set):
+    r"""
+    Linked Message
+    """
+
+    def __repr__(self):
+        return super(Message, self).__repr__()
+
+
+class Guard:
+    r"""
+    Descriptor guarding Linked attributes
+    """
+
+    def __init__(self, unit=None, rng=None):
+        pass
 
     def __get__(self, instance, owner):
-        if hasattr(instance, self.key):
-            value = getattr(instance, self.key)
-            return value
-        else:
-            return None
+        return getattr(instance, self.guard_name)
 
     def __set__(self, instance, value):
-        upd = set()
-        if isinstance(value, set):
-            upd = value
-            value = getattr(instance, self.property)
-            sorted_fun = Linked.get_sorted_functions(upd, self._args)
-            for func in sorted_fun:
-                kwargs = copy(self._linked_properties[func])
-                for arg in kwargs.keys():
-                    kwargs[arg] = getattr(instance, kwargs[arg])
-                if any([x is None for x in kwargs.values()]):
-                    continue
-                value = func(**kwargs)
-                logging.debug('Property {} calculated'.format(self.property))
-                break
-
-        if type(getattr(instance, self.property)) != type(value) or (
-            getattr(instance, self.property) != value and value is not None):
+        unit = getattr(instance, self.unit_name)
+        if isinstance(value, ureg.Quantity) and unit is not None:
             try:
-                if isinstance(value, ureg.Quantity):
-                    value = value.to(self.unit)
+                value = value.to(unit)
             except DimensionalityError as e:
                 raise DimensionalityError(e.units1, e.units2, e.dim1, e.dim2,
                                           'Wrong dimensions when setting {} with value {}'.format(
-                                              self.property, value))
-            if not Linked.in_range(value, self.rng):
-                raise OutOfRangeError(value, self.rng, self.property)
-            setattr(instance, self.key, value)
-            if self.property not in upd:
-                upd.add(self.property)
-                getattr(instance, self.subject_key).send(instance, upd)
+                                              self.name, value))
+        rng = getattr(instance, self.rng_name)
+        if rng is not None:
+            if not Guard.in_range(value, rng):
+                raise OutOfRangeError(value, rng, self.name)
+        setattr(instance, self.guard_name, value)
+
+    def __del__(self):
+        pass
+
+    def __set_name__(self, owner, name):
+        self.name = name
+        self.guard_name = '_Guard_{}'.format(name)
+        self.rng_name = '_Guard_{}_rng'.format(name)
+        self.unit_name = '_Guard_{}_unit'.format(name)
+        setattr(owner, self.guard_name, None)
+        setattr(owner, self.rng_name, None)
+        setattr(owner, self.unit_name, None)
 
     @staticmethod
     def in_range(value, rng):
+        r"""
+        is value in specified range
+
+        Args:
+            value: value to be tested
+            rng: tuple or list to be tested against
+
+        Returns:
+            true when in range otherwise false
+        """
         if isinstance(value, ureg.Quantity):
             return any(((rng[0].m <= value.m) & (rng[1].m >= value.m))) or any(isnan(value.m))
         else:
             return any(((rng[0].m <= value) & (rng[1].m >= value))) or any(isnan(value))
 
-    @staticmethod
-    def argument_weight(visited, arg):
+
+class Linked:
+    r""""
+    A linked attribute class
+    """
+
+    def __init__(self, **kwargs):
+        self._depended_on = {}
+        self._linked_attributes = {}
+        self._linked_attributes_args = {}
+        self._state = []
+        self._logistic_properties = []
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+    def __setattr__(self, key, value):
+        upd = Message()
+        if isinstance(value, Message):  # Chain Message received
+            if (self, key) in value:
+                return
+            upd = value
+            value = None
+            sorted_transforms = self._get_sorted_functions(upd, self._linked_attributes_args[key])
+            for transform in sorted_transforms:
+                kwargs = {}
+                for arg, attr in self._linked_attributes[key][transform].items():
+                    logging.debug(attr)
+                    kwargs[arg] = getattr(attr[0], attr[1])
+                    if kwargs[arg] is None:
+                        break
+                if kwargs[arg] is None:
+                    continue
+                value = transform(**kwargs)
+                if value is not None:
+                    continue
+            if value is not None:
+                super(Linked, self).__setattr__(key, value)
+                logging.debug('Transform set for {} -> {} with {}'.format(id(self), key, value))
+                self._send(key, upd)
+        else:
+            super(Linked, self).__setattr__(key, value)
+            logging.debug('User set for {} -> {} with {}'.format(id(self), key, value))
+            self._send(key, upd)
+
+    def __delattr__(self, item):
+        super(Linked, self).__delattr__(item)
+
+    def __repr__(self):
+        state = {}
+        for prop in self._logistic_properties:
+            if getattr(self, prop) is not None:
+                state[prop] = getattr(self, prop)
+        for prop in self._state:
+            if getattr(self, prop) is not None:
+                state[prop] = getattr(self, prop)
+        return '{} with state {}>'.format(str(type(self))[:-2], state)
+
+    def __call__(self, **kwargs):
+        state = deepcopy(self)
+        for key, value in kwargs.items():
+            if hasattr(state, key):
+                setattr(state, key, value)
+        return state
+
+    def _tbl_writer(self, writer):
+        writer.headers = ['Material Attribute', 'Value']
+        tbl = []
+        if isinstance(writer, MarkdownTableWriter) or isinstance(writer, LatexTableWriter):
+            value_str = '$ {:L} $'
+        else:
+            value_str = '{}'
+        for prop in self._logistic_properties:
+            if getattr(self, prop) is not None:
+                tbl.append([prop.replace('_', ' '), str(getattr(self, prop))])
+        for prop in self._state:
+            if getattr(self, prop) is not None:
+                tbl.append([prop.replace('_', ' '), value_str.format(getattr(self, prop))])
+        writer.value_matrix = tbl
+        writer.margin = 1
+        return writer
+
+    def _repr_markdown_(self):
+        writer = self._tbl_writer(MarkdownTableWriter())
+        return writer.write_table()
+
+    def _repr_html_(self):
+        writer = self._tbl_writer(HtmlTableWriter())
+        return writer.write_table()
+
+    def _repr_latex_(self):
+        writer = self._tbl_writer(LatexTableWriter())
+        return writer.write_table()
+
+    def _send(self, key, upd):
+        if (self, key) in self._depended_on:
+            upd.add((self, key))
+            for cls, attr in self._depended_on[(self, key)]:
+                logging.debug(cls)
+                setattr(cls, attr, upd)
+
+    def _argument_weight(self, visited, arg):
         return len(visited.intersection(arg)) / len(arg)
 
-    @staticmethod
-    def get_sorted_functions(visited, args):
-        return [func[0] for func in sorted(args.items(), key=lambda value: Linked.argument_weight(visited, value[1]))]
+    def _get_sorted_functions(self, visited, args):
+        return [transform[0] for transform in sorted(args.items(), key=lambda value: self._argument_weight(visited,
+                                                                                                           value[1]))]
 
+    def set_guard(self, attr, unit=None, rng=None):
+        r"""
+        Set the guard descriptor unit and range, this is usually set in the __init__() function
 
-class MetaLinked(type):
-    def __init__(cls, name, bases, attr_dict):
-        super().__init__(name, bases, attr_dict)
-        if not hasattr(cls, '_linked'):
-            setattr(cls, '_linked', dict())
-        if not hasattr(cls, '_state'):
-            setattr(cls, '_state', list())
-        for key, attr in attr_dict.items():
-            if isinstance(attr, Linked):
-                attr.property = key
-                type_name = type(attr).__name__
-                attr.key = '_{}__{}'.format(type_name, key)
-                attr.subject_key = '_Subject__{}'.format(key)
-                if key[0] != '_' and key not in getattr(cls, '_state'):
-                    getattr(cls, '_state').append(key)
-                getattr(cls, '_linked')[key] = attr
+        Args:
+            attr (str): The guard attribute to be set
+            unit (ureg.Unit): The unit in which guarded inputs are to be converted
+            rng (tuple, list, np.array): The range [low, high] against which to test
+        """
+        if attr not in self._state and attr[0] != '_':
+            self._state.append(attr)
+        self._state.sort()
+        setattr(self, '_Guard_{}_unit'.format(attr), unit)
+        if rng is not None and not isinstance(rng, ureg.Quantity) and unit is not None:
+            setattr(self, '_Guard_{}_rng'.format(attr), rng * unit)
+        else:
+            setattr(self, '_Guard_{}_rng'.format(attr), rng)
+
+    def link_attr(self, attr, transform, **kwargs):
+        r"""
+        Link a Linked attribute against another Linked attribute.
+
+        Args:
+            attr (str): Attribute name
+            transform: The function which provides the transform.
+            **kwargs: the transform function keywords where the value is either a str (if the attribute can be obtained
+             from the own instance) or a tuple containing the other instance and attribute name.
+        """
+        if attr not in self._linked_attributes:
+            self._linked_attributes[attr] = {}
+            self._linked_attributes_args[attr] = {}
+        self._linked_attributes[attr][transform] = {}
+        self._linked_attributes_args[attr][transform] = set()
+
+        for arg, depend in kwargs.items():
+
+            cls = self
+            dep = depend
+            if hasattr(depend, '__iter__') and isinstance(depend[0], Linked):
+                cls = depend[0]
+                dep = depend[1]
+            if not isinstance(dep, str) or not hasattr(cls, dep):
+                dep_name = '_const_{}'.format(hash((cls, dep)))
+                setattr(cls, dep_name, dep)
+                dep = dep_name
+            if hasattr(cls, '_depended_on'):
+                if (cls, dep) not in getattr(cls, '_depended_on'):
+                    getattr(cls, '_depended_on')[(cls, dep)] = set()
+                getattr(cls, '_depended_on')[(cls, dep)].add((self, attr))
+            self._linked_attributes[attr][transform][arg] = (cls, dep)
+            self._linked_attributes_args[attr][transform].add((cls, dep))
