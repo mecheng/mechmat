@@ -23,7 +23,7 @@ class Guard:
     Descriptor guarding Linked attributes
     """
 
-    def __init__(self, unit=None, rng=None):
+    def __init__(self):
         pass
 
     def __get__(self, instance, owner):
@@ -232,3 +232,15 @@ class Linked:
                 getattr(cls, '_depended_on')[(cls, dep)].add((self, attr))
             self._linked_attributes[attr][transform][arg] = (cls, dep)
             self._linked_attributes_args[attr][transform].add((cls, dep))
+
+    def unlink_attr(self, attr, transform):
+        # Todo implement
+        for key, value in self._linked_attributes[attr][transform].items():
+            pass
+
+        del self._linked_attributes[attr][transform]
+        del self._linked_attributes_args[attr][transform]
+
+    def linked_transforms(self, attr):
+        return dict(zip(self._linked_attributes[attr].keys(),
+                        [list(x.keys()) for x in list(self._linked_attributes['density'].values())]))
