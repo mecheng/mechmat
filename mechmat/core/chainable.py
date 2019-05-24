@@ -5,7 +5,7 @@ from numpy import isnan, any
 from pint import DimensionalityError
 from pytablewriter import MarkdownTableWriter, HtmlTableWriter, LatexTableWriter
 
-from . import ureg
+from mechmat import ureg
 from .errors import OutOfRangeError
 
 
@@ -18,7 +18,7 @@ class Message(set):
         return super(Message, self).__repr__()
 
 
-class Guard:
+class Guarded:
     r"""
     Descriptor guarding Linked attributes
     """
@@ -40,7 +40,7 @@ class Guard:
                                               self.name, value))
         rng = getattr(instance, self.rng_name)
         if rng is not None:
-            if not Guard.in_range(value, rng):
+            if not Guarded.in_range(value, rng):
                 raise OutOfRangeError(value, rng, self.name)
         setattr(instance, self.guard_name, value)
 
@@ -74,7 +74,7 @@ class Guard:
             return any(((rng[0].m <= value) & (rng[1].m >= value))) or any(isnan(value))
 
 
-class Linked:
+class Chainable:
     r""""
     A linked attribute class
     """
@@ -110,16 +110,16 @@ class Linked:
                 if value is not None:
                     continue
             if value is not None:
-                super(Linked, self).__setattr__(key, value)
+                super(Chainable, self).__setattr__(key, value)
                 logging.debug('Transform set for {} -> {} with {}'.format(id(self), key, value))
                 self._send(key, upd)
         else:
-            super(Linked, self).__setattr__(key, value)
+            super(Chainable, self).__setattr__(key, value)
             logging.debug('User set for {} -> {} with {}'.format(id(self), key, value))
             self._send(key, upd)
 
     def __delattr__(self, item):
-        super(Linked, self).__delattr__(item)
+        super(Chainable, self).__delattr__(item)
 
     def __repr__(self):
         state = {}
@@ -137,6 +137,16 @@ class Linked:
             if hasattr(state, key):
                 setattr(state, key, value)
         return state
+
+    def __dir__(self):
+        _dir = list(super(Chainable, self).__dir__())
+        _dir.remove('_linked_attributes')
+        _dir.remove('_linked_attributes_args')
+        _dir.remove('_depended_on')
+        _dir.remove('_logistic_properties')
+        _dir.remove('_state')
+        _dir.remove('_version')
+        return [d for d in [d for d in _dir if '_Guard_' not in d] if '_const_' not in d]
 
     def _tbl_writer(self, writer):
         writer.headers = ['Material Attribute', 'Value']
@@ -181,7 +191,7 @@ class Linked:
         return [transform[0] for transform in sorted(args.items(), key=lambda value: self._argument_weight(visited,
                                                                                                            value[1]))]
 
-    def set_guard(self, attr, unit=None, rng=None):
+    def set_guard(self, attr, unit=None, rng=None, doc=None):
         r"""
         Set the guard descriptor unit and range, this is usually set in the __init__() function
 
@@ -189,11 +199,13 @@ class Linked:
             attr (str): The guard attribute to be set
             unit (ureg.Unit): The unit in which guarded inputs are to be converted
             rng (tuple, list, np.array): The range [low, high] against which to test
+            doc (str): dosctring
         """
         if attr not in self._state and attr[0] != '_':
             self._state.append(attr)
         self._state.sort()
         setattr(self, '_Guard_{}_unit'.format(attr), unit)
+        setattr(self, '_Guard_{}_doc'.format(attr), '{}. {} should be given in {}'.format(doc, attr, unit))
         if rng is not None and not isinstance(rng, ureg.Quantity) and unit is not None:
             setattr(self, '_Guard_{}_rng'.format(attr), rng * unit)
         else:
@@ -219,7 +231,7 @@ class Linked:
 
             cls = self
             dep = depend
-            if hasattr(depend, '__iter__') and isinstance(depend[0], Linked):
+            if hasattr(depend, '__iter__') and isinstance(depend[0], Chainable):
                 cls = depend[0]
                 dep = depend[1]
             if not isinstance(dep, str) or not hasattr(cls, dep):

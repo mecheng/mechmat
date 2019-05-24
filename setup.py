@@ -11,7 +11,7 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ['pint', 'numpy', 'pyyaml', 'pytablewriter', 'dominate']
+requirements = ['pint', 'numpy', 'pyyaml', 'pytablewriter', 'dominate', 'mechcite']
 
 setup_requirements = ['pytest-runner', ]
 
@@ -42,7 +42,7 @@ setup(
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://gitlab.com/pymech/mechmat',
+    url='https://github.com/mecheng/mechmat',
     version='0.1.4',
     zip_safe=False,
 )

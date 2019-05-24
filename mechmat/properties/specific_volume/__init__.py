@@ -1,0 +1,1 @@
+from mechmat.properties.specific_volume.twodomaintaitpvt import TwoDomainTaitpvT
