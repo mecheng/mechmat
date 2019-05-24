@@ -1,16 +1,17 @@
 mechmat package
 ===============
 
+Subpackages
+-----------
+
+.. toctree::
+
+    mechmat.core
+    mechmat.principal
+    mechmat.properties
+
 Submodules
 ----------
-
-mechmat.linked module
----------------------
-
-.. automodule:: mechmat.linked
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 mechmat.material module
 -----------------------
@@ -20,10 +21,10 @@ mechmat.material module
     :undoc-members:
     :show-inheritance:
 
-mechmat.subject module
+mechmat.polymer module
 ----------------------
 
-.. automodule:: mechmat.subject
+.. automodule:: mechmat.polymer
     :members:
     :undoc-members:
     :show-inheritance:
