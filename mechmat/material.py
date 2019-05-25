@@ -45,8 +45,7 @@ class Base(Chainable):
         self._short_name = value
 
 
-
-def material_factory(flow=False, *args, **kwargs):
+def material_factory(*args, flow=False, **kwargs):
     class Material(Base, Thermal, Pressure, *args):
         def __init__(self, **kwargs):
             super(Material, self).__init__(**kwargs)
