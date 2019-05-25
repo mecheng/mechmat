@@ -44,15 +44,6 @@ class Base(Chainable):
     def short_name(self, value):
         self._short_name = value
 
-    def __repr__(self):
-        state = {}
-        for prop in self._logistic_properties:
-            if getattr(self, prop) is not None:
-                state[prop] = getattr(self, prop)
-        for prop in self._state:
-            if getattr(self, prop) is not None:
-                state[prop] = getattr(self, prop)
-        return '{} with state {}>'.format(str(type(self))[:-2], state)
 
 
 def material_factory(flow=False, *args, **kwargs):
@@ -67,7 +58,7 @@ def material_factory(flow=False, *args, **kwargs):
 
         return FlowMaterial(**kwargs)
     else:
-        class StaticMaterial(Material, Geometry, Mass, args):
+        class StaticMaterial(Material, Geometry, Mass):
             def __init__(self, **kwargs):
                 super(StaticMaterial, self).__init__(**kwargs)
 

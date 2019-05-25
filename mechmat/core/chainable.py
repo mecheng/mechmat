@@ -169,22 +169,25 @@ class Chainable:
                 tbl.append([prop.replace('_', ' '), str(getattr(self, prop))])
         for prop in self._state:
             if getattr(self, prop) is not None:
-                tbl.append([prop.replace('_', ' '), value_str.format(getattr(self, prop))])
+                try:
+                    tbl.append([prop.replace('_', ' '), value_str.format(getattr(self, prop))])
+                except:
+                    tbl.append([prop.replace('_', ' '), '{}'.format(getattr(self, prop))])
         writer.value_matrix = tbl
         writer.margin = 1
         return writer
 
     def _repr_markdown_(self):
         writer = self._tbl_writer(MarkdownTableWriter())
-        return writer.write_table()
+        return writer.dumps()
 
     def _repr_html_(self):
         writer = self._tbl_writer(HtmlTableWriter())
-        return writer.write_table()
+        return writer.dumps()
 
     def _repr_latex_(self):
         writer = self._tbl_writer(LatexTableWriter())
-        return writer.write_table()
+        return writer.dumps()
 
     def _send(self, key, upd):
         if (self, key) in self._depended_on:
