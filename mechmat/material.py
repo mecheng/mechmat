@@ -12,7 +12,7 @@ class Base(Chainable):
     def __init__(self, **kwargs):
         super(Base, self).__init__(**kwargs)
 
-        self._logistic_properties += ['name', 'short_name', 'CAS', 'category']
+        self._logistic_properties += ['name', 'short_name', 'CAS']
 
     _version = 1
     """int: version of the material class. Bump this value up for big changes in the class which aren't compatible with 
