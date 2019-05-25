@@ -1,7 +1,7 @@
 from mechmat import ureg
 from mechmat.core.chainable import Chainable, Guarded
 from mechmat.principal import crossarrhenius
-
+from mechcite import cite
 
 class CrossArrhenius(Chainable):
     r"""
@@ -30,13 +30,14 @@ class CrossArrhenius(Chainable):
         * viscosity_zero_shear_rate_ref
     """
 
+    @cite('osswald_polymer_2006')
     def __init__(self, **kwargs):
         super(CrossArrhenius, self).__init__(**kwargs)
 
         self.set_guard('arrhenius_activation_energy', ureg.J / ureg.mol)
 
         self.set_guard('_arrhenius', ureg.dimensionless)
-        self.link_attr('_arrhenius', crossarrhenius.arrhenius, temperature='temperature',
+        self.link_attr('_arrhenius', crossarrhenius.arrhenius_shift, temperature='temperature',
                        arrhenius_activation_energy='arrhenius_activation_energy',
                        temperature_ref='temperature_cross_arrhenius_ref')
 
