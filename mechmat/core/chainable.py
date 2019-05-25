@@ -7,6 +7,7 @@ from pytablewriter import MarkdownTableWriter, HtmlTableWriter, LatexTableWriter
 
 from mechmat import ureg
 from .errors import OutOfRangeError
+from mechcite import Bibliography
 
 
 class Message(set):
@@ -42,6 +43,7 @@ class Guarded:
         if rng is not None:
             if not Guarded.in_range(value, rng):
                 raise OutOfRangeError(value, rng, self.name)
+        Guarded.cite_value(value)
         setattr(instance, self.guard_name, value)
 
     def __del__(self):
@@ -55,6 +57,8 @@ class Guarded:
         setattr(owner, self.guard_name, None)
         setattr(owner, self.rng_name, None)
         setattr(owner, self.unit_name, None)
+
+    _bib = Bibliography()
 
     @staticmethod
     def in_range(value, rng):
@@ -72,6 +76,11 @@ class Guarded:
             return any(((rng[0].m <= value.m) & (rng[1].m >= value.m))) or any(isnan(value.m))
         else:
             return any(((rng[0].m <= value) & (rng[1].m >= value))) or any(isnan(value))
+
+    @staticmethod
+    def cite_value(value):
+        if hasattr(value, '_cite'):
+            Guarded._bib.cite(getattr(value, '_cite'))
 
 
 class Chainable:
