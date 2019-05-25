@@ -1,8 +1,10 @@
+from mechcite import cite
 from math import pi
 
 __all__ = ['circle', 'annulus']
 
 
+@cite('rao_basic_2017')
 def circle(V_dot, r):
     r""""
     The apparent shear rate for a melt flowing through a cirlce is defined as
@@ -23,6 +25,7 @@ def circle(V_dot, r):
     return 4. * V_dot / (pi * r ** 3)
 
 
+@cite('rao_basic_2017')
 def annulus(V_dot, r_i, r_o):
     r"""
     The apparent shear rate for a melt flowing through a annulus is defined as
