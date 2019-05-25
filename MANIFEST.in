@@ -4,6 +4,8 @@ include HISTORY.rst
 include LICENSE
 include README.rst
 
+include mechmat/resources/sources.bib
+
 recursive-include tests *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]

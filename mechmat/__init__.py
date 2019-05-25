@@ -12,5 +12,6 @@ ureg = UnitRegistry(autoconvert_offset_to_baseunit=True)
 Q_ = ureg.Quantity
 set_application_registry(ureg)
 
+from mechmat.core.bibliography import bib
 from mechmat.core.chainable import Chainable, Guarded
 from mechmat.material import material_factory
