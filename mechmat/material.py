@@ -55,10 +55,10 @@ def material_factory(*args, flow=False, **kwargs):
             def __init__(self, **kwargs):
                 super(FlowMaterial, self).__init__(**kwargs)
 
-        return FlowMaterial(**kwargs)
+        return FlowMaterial()(**kwargs)
     else:
         class StaticMaterial(Material, Geometry, Mass):
             def __init__(self, **kwargs):
                 super(StaticMaterial, self).__init__(**kwargs)
 
-        return StaticMaterial(**kwargs)
+        return StaticMaterial()(**kwargs)

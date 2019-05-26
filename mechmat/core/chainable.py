@@ -94,9 +94,6 @@ class Chainable:
         self._linked_attributes_args = {}
         self._state = []
         self._logistic_properties = []
-        for key, value in kwargs.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
 
     def __setattr__(self, key, value):
         upd = Message()
