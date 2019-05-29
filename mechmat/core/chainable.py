@@ -135,7 +135,7 @@ class Chainable:
         for prop in self._state:
             if getattr(self, prop) is not None:
                 state[prop] = getattr(self, prop)
-        return '{} with state {}>'.format(str(type(self))[:-2], state)
+        return '<{} with state {}>'.format(str(self.__class__).split('.')[-1][:-2], state)
 
     def __call__(self, **kwargs):
         state = deepcopy(self)
