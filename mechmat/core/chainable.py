@@ -146,13 +146,11 @@ class Chainable:
 
     def __dir__(self):
         _dir = list(super(Chainable, self).__dir__())
-        _dir.remove('_linked_attributes')
-        _dir.remove('_linked_attributes_args')
-        _dir.remove('_depended_on')
-        _dir.remove('_logistic_properties')
-        _dir.remove('_state')
-        _dir.remove('_version')
+        for hide in self._hidden_dir:
+            _dir.remove(hide)
         return [d for d in [d for d in _dir if '_Guard_' not in d] if '_const_' not in d]
+
+    _hidden_dir = ['_linked_attributes', '_linked_attributes_args', '_depended_on', '_logistic_properties', '_state', '_version', '_hidden_dir']
 
     def _tbl_writer(self, writer):
         writer.headers = ['Material Attribute', 'Value']

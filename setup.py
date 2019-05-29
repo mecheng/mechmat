@@ -11,7 +11,7 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ['pint', 'numpy', 'pyyaml', 'pytablewriter', 'dominate', 'mechcite', 'scipy']
+requirements = ['pint', 'numpy', 'dill', 'pytablewriter', 'dominate', 'mechcite', 'scipy']
 
 setup_requirements = ['pytest-runner', ]
 
