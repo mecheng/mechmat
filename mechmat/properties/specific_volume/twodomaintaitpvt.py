@@ -3,7 +3,6 @@ from mechmat import ureg
 from mechmat.core.chainable import Chainable, Guarded
 from mechmat.principal import twodomaintaitpvt
 
-@cite('osswald_polymer_2006')
 class TwoDomainTaitpvT(Chainable):
     r"""
     The modified 2-domain Tait pvT model is used to determine the density of the material as a function of the temperature and pressure. This variation impacts on many aspects of the flow simulation.
@@ -40,6 +39,7 @@ class TwoDomainTaitpvT(Chainable):
         * pressure
     """
 
+    @cite('osswald_polymer_2006')
     def __init__(self, **kwargs):
         super(TwoDomainTaitpvT, self).__init__(**kwargs)
         self.temperature_transition = self.temperature_transition  # need for initialization of material state
