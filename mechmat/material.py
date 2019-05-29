@@ -4,6 +4,7 @@ from mechmat.properties.thermal import Thermal
 from mechmat.properties.pressure import Pressure
 from mechmat.properties.flow import Flow
 from mechmat.core.chainable import Chainable
+import dill as _dill
 
 __all__ = ['material_factory']
 
@@ -92,3 +93,14 @@ class Material(Chainable):
     @short_name.setter
     def short_name(self, value):
         self._short_name = value
+
+    @staticmethod
+    def dump(instance, filename):
+        with open(filename, 'wb') as f:
+            _dill.dump(instance, f)
+
+    @staticmethod
+    def load(filename):
+        with open(filename, 'rb') as f:
+            mat = _dill.load(f)
+        return mat
