@@ -42,8 +42,6 @@ class Interp:
     def __call__(self, **kwargs):
         return self._func(*list(kwargs.values()))
 
-    _yaml_tag = u'!mechmat.principal.core.Interp'
-
     def _build_interp(self, kind, **kwargs):
         args = self._args
         if len(kwargs) == 2:
