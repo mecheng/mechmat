@@ -46,7 +46,6 @@ class CrossArrhenius(Chainable):
                        zero_shear_viscosity_ref='viscosity_zero_shear_rate_ref')
 
         self.set_guard('relaxation_time_ref', ureg.s)
-        self.set_guard('viscosity_dynamic', ureg.Pa * ureg.s)
         self.link_attr('viscosity_dynamic', crossarrhenius.viscosity_dynamic, shear_rate='shear_rate',
                        zero_shear_viscosity='viscosity_zero_shear_rate', relaxation_time='relaxation_time',
                        shear_thinning_const='shear_thinning_const')
@@ -68,8 +67,6 @@ class CrossArrhenius(Chainable):
     relaxation_time = Guarded()
 
     relaxation_time_ref = Guarded()
-
-    viscosity_dynamic = Guarded()
 
     viscosity_zero_shear_rate = Guarded()
 

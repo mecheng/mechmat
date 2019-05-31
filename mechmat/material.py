@@ -2,6 +2,8 @@ from mechmat.properties.geometry import Geometry
 from mechmat.properties.mass import Mass
 from mechmat.properties.thermal import Thermal
 from mechmat.properties.pressure import Pressure
+from mechmat.properties.viscosity import Viscosity
+from mechmat.properties.shearing import Shearing
 from mechmat.properties.flow import Flow
 from mechmat.core.chainable import Chainable
 import dill as _dill
@@ -27,7 +29,7 @@ def material_factory(*args, flow=False, **kwargs):
 
 def material_type_factory(*args, flow=False):
     if flow:
-        class FlowMaterial(Material, Thermal, Pressure, Flow, *args):
+        class FlowMaterial(Material, Thermal, Pressure, Flow, Shearing, Viscosity, *args):
             def __init__(self, **kwargs):
                 super(FlowMaterial, self).__init__(**kwargs)
 
