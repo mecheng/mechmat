@@ -33,10 +33,10 @@ class CrossWLF(Chainable):
         self.set_guard('tau_star', ureg.Pa)
         self.link_attr('tau_star', crosswlf.critical_shear_stress, n='n')
 
-        self.link_attr('temperature_glass_transition', crosswlf.glass_transition_temperature, D_2='D_2', D_3='D_3', p='pressure')
+        self.link_attr('temperature_glass', crosswlf.glass_transition_temperature, D_2='D_2', D_3='D_3', p='pressure')
 
         self.link_attr('viscosity_zero_shear_rate', crosswlf.zero_shear_viscosity, temperature='temperature', D_1='D_1',
-                       temperature_glass_transition='temperature_glass_transition', A_1='A_1', A_2='A_2')
+                       temperature_glass_transition='temperature_glass', A_1='A_1', A_2='A_2')
 
         self.link_attr('viscosity_dynamic', crosswlf.viscosity_dynamic, shear_rate='shear_rate', tau_star='tau_star', zero_shear_viscosity='viscosity_zero_shear_rate', n='n')
 

@@ -10,6 +10,7 @@ class Polycarbonate_CrossWLF(ThermalPolymer, CrossWLF):
         super(Polycarbonate_CrossWLF, self).__init__(**kwargs)
 
         osswald_polymer_2015 = cite('osswald_polymer_2015')
+        osswald_materials_2012 = cite('osswald_materials_2012')
 
         self.n = osswald_polymer_2015(0.116 * ureg.dimensionless)
         self.D_1 = osswald_polymer_2015(462. * ureg.Pa * ureg.s)
@@ -17,6 +18,11 @@ class Polycarbonate_CrossWLF(ThermalPolymer, CrossWLF):
         self.D_3 = osswald_polymer_2015(0. * ureg.K / ureg.Pa)
         self.A_1 = osswald_polymer_2015(8.4 * ureg.dimensionless)
         self.A_2 = osswald_polymer_2015(246.8 * ureg.K)
+
+        self.specific_heat_capacity = osswald_materials_2012(1.26 * ureg.kJ / (ureg.kg * ureg.K))
+        self.thermal_conductivity = osswald_materials_2012(0.2 * ureg.W / (ureg.m * ureg.K))
+        self.thermal_expansion_coeff = osswald_materials_2012(65. * ureg.um / (ureg.m * ureg.K))
+        self.thermal_diffusivity = osswald_materials_2012(1.47 * ureg.m**2 / ureg.s)
 
         self.viscosity_dynamic = self.viscosity_dynamic
 
@@ -26,12 +32,19 @@ class PolystyreneCrossWLF(ThermalPolymer, CrossWLF):
         super(PolystyreneCrossWLF, self).__init__(**kwargs)
 
         osswald_polymer_2015 = cite('osswald_polymer_2015')
+        osswald_materials_2012 = cite('osswald_materials_2012')
+
         self.n = osswald_polymer_2015(0.243 * ureg.dimensionless)
         self.D_1 = osswald_polymer_2015(1223. * ureg.Pa * ureg.s)
         self.D_2 = osswald_polymer_2015(503. * ureg.K)
         self.D_3 = osswald_polymer_2015(0. * ureg.K / ureg.Pa)
         self.A_1 = osswald_polymer_2015(6.5 * ureg.dimensionless)
         self.A_2 = osswald_polymer_2015(158.2 * ureg.K)
+
+        self.specific_heat_capacity = osswald_materials_2012(1.34 * ureg.kJ / (ureg.kg * ureg.K))
+        self.thermal_conductivity = osswald_materials_2012(0.15 * ureg.W / (ureg.m * ureg.K))
+        self.thermal_expansion_coeff = osswald_materials_2012(80. * ureg.um / (ureg.m * ureg.K))
+        self.thermal_diffusivity = osswald_materials_2012(0.6 * ureg.m**2 / ureg.s)
 
         self.viscosity_dynamic = self.viscosity_dynamic
 
@@ -41,12 +54,19 @@ class Polyamide66CrossWLF(ThermalPolymer, CrossWLF):
         super(Polyamide66CrossWLF, self).__init__(**kwargs)
 
         osswald_polymer_2015 = cite('osswald_polymer_2015')
+        osswald_materials_2012 = cite('osswald_materials_2012')
+
         self.n = osswald_polymer_2015(0.347 * ureg.dimensionless)
         self.D_1 = osswald_polymer_2015(144. * ureg.Pa * ureg.s)
         self.D_2 = osswald_polymer_2015(573. * ureg.K)
         self.D_3 = osswald_polymer_2015(0. * ureg.K / ureg.Pa)
         self.A_1 = osswald_polymer_2015(256999.6 * ureg.dimensionless)
         self.A_2 = osswald_polymer_2015(11235949 * ureg.K)
+
+        self.specific_heat_capacity = osswald_materials_2012(1.67 * ureg.kJ / (ureg.kg * ureg.K))
+        self.thermal_conductivity = osswald_materials_2012(0.24 * ureg.W / (ureg.m * ureg.K))
+        self.thermal_expansion_coeff = osswald_materials_2012(90. * ureg.um / (ureg.m * ureg.K))
+        self.thermal_diffusivity = osswald_materials_2012(1.01 * ureg.m**2 / ureg.s)
 
         self.viscosity_dynamic = self.viscosity_dynamic
 
@@ -56,12 +76,19 @@ class PolypropyleneCrossWLF(ThermalPolymer, CrossWLF):
         super(PolypropyleneCrossWLF, self).__init__(**kwargs)
 
         osswald_polymer_2015 = cite('osswald_polymer_2015')
+        osswald_materials_2012 = cite('osswald_materials_2012')
+
         self.n = osswald_polymer_2015(0.251 * ureg.dimensionless)
         self.D_1 = osswald_polymer_2015(564. * ureg.Pa * ureg.s)
         self.D_2 = osswald_polymer_2015(493. * ureg.K)
         self.D_3 = osswald_polymer_2015(0. * ureg.K / ureg.Pa)
         self.A_1 = osswald_polymer_2015(2803.3 * ureg.dimensionless)
         self.A_2 = osswald_polymer_2015(165097.1 * ureg.K)
+
+        self.specific_heat_capacity = osswald_materials_2012(1.93 * ureg.kJ / (ureg.kg * ureg.K))
+        self.thermal_conductivity = osswald_materials_2012(0.24 * ureg.W / (ureg.m * ureg.K))
+        self.thermal_expansion_coeff = osswald_materials_2012(100. * ureg.um / (ureg.m * ureg.K))
+        self.thermal_diffusivity = osswald_materials_2012(0.65 * ureg.m**2 / ureg.s)
 
         self.viscosity_dynamic = self.viscosity_dynamic
 
