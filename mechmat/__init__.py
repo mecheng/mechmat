@@ -4,7 +4,7 @@
 
 __author__ = """Jelle Spijker"""
 __email__ = 'spijker.jelle@gmail.com'
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 from pint import UnitRegistry, set_application_registry
 
