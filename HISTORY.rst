@@ -42,3 +42,13 @@ History
 * repr string simplified
 * Cross-WLF model added
 * Some example materials added: PLA, PLA-TPU, PLA-TPS
+
+0.2.3 (2019-05-31)
+------------------
+
+* Added multiple thermal properties
+
+0.2.4 (2019-07-09)
+------------------
+
+* Bug fix citations
